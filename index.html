@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Student Quiz</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
+
+      /* 🌈 Background */
+      body {
+        font-family: "Poppins", sans-serif;
+        background: radial-gradient(circle at top left, #0a5221, #083818);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        color: #222;
+      }
+
+      /* 💎 Card Container */
+      .container {
+        background: rgba(255, 255, 255, 0.12);
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(20px);
+        width: 95%;
+        max-width: 450px;
+        animation: fadeIn 0.6s ease-in-out;
+        color: #fff;
+      }
+
+      h2 {
+        text-align: center;
+        font-size: 2rem;
+        color: #fff;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+      }
+
+      label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: block;
+        margin-bottom: 6px;
+        color: #f0f0f0;
+      }
+
+      input[type="text"],
+      input[type="number"],
+      input[type="email"] {
+        width: 93%;
+        padding: 0.9rem;
+        border-radius: 10px;
+        border: none;
+        font-size: 0.95rem;
+        background: rgba(255, 255, 255, 0.485);
+        color: white;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        margin-bottom: 1rem;
+        outline: none;
+        transition: all 0.3s ease;
+      }
+
+      input:focus {
+        background: rgba(255, 255, 255, 0.341);
+        box-shadow: 0 0 0 2px #42e37c;
+      }
+
+      button {
+        width: 100%;
+        background: linear-gradient(135deg, #1db954, #159947);
+        color: #fff;
+        padding: 0.9rem;
+        font-size: 1rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 0.5rem;
+      }
+
+      button:hover {
+        background: linear-gradient(135deg, #159947, #0e7233);
+        transform: translateY(-3px);
+      }
+
+      /* 🕓 Timer + Progress */
+      #timer {
+        text-align: center;
+        font-weight: 600;
+        color: #a6ffb2;
+        margin-bottom: 10px;
+      }
+
+      #progress {
+        text-align: center;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+      }
+
+      /* 🔋 Progress Bar */
+      .progress-bar {
+        width: 100%;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 15px;
+      }
+
+      .progress-fill {
+        width: 0%;
+        height: 100%;
+        background: linear-gradient(90deg, #3eff7e, #0bd667);
+        transition: width 0.3s ease;
+      }
+
+      /* 📚 Question & Options */
+      h3 {
+        text-align: center;
+        font-size: 1.3rem;
+        color: #fff;
+        margin-bottom: 1rem;
+      }
+
+      .option {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.15);
+        margin: 8px 0;
+        padding: 10px 14px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background 0.3s ease, transform 0.2s ease;
+      }
+
+      .option:hover {
+        background: rgba(66, 227, 124, 0.2);
+        transform: translateX(5px);
+      }
+
+      input[type="radio"] {
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        border: 2px solid #3eff7e;
+        margin-right: 10px;
+        cursor: pointer;
+        position: relative;
+      }
+
+      input[type="radio"]:checked {
+        background: #3eff7e;
+      }
+
+      #result {
+        text-align: center;
+        font-size: 1rem;
+        margin-top: 1rem;
+      }
+
+      .thank-you {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #3eff7e;
+      }
+
+      #downloadLink {
+        display: none;
+        text-align: center;
+        margin-top: 1rem;
+        padding: 0.8rem 1.5rem;
+        background: linear-gradient(135deg, #1db954, #0f8a3a);
+        color: white;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.3s ease;
+      }
+
+      #downloadLink:hover {
+        background: linear-gradient(135deg, #0f8a3a, #0a6e2c);
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Student Info Form -->
+    <div class="container" id="formContainer">
+      <h2>🎓 Student Information</h2>
+      <label>First Name</label>
+      <input type="text" id="first" placeholder="Enter first name" />
+      <label>Middle Name</label>
+      <input type="text" id="middle" placeholder="Enter middle name" />
+      <label>Last Name</label>
+      <input type="text" id="last" placeholder="Enter last name" />
+      <label>Email</label>
+      <input type="email" id="email" placeholder="Enter Gmail address" />
+      <label>Age</label>
+      <input type="number" id="age" placeholder="Enter age" />
+      <button onclick="startQuiz()">Start Quiz</button>
+    </div>
+
+    <!-- Quiz Container -->
+    <div class="container" id="quizContainer" style="display: none">
+      <div id="timer">Time Left: 30:00</div>
+      <div class="progress-bar"><div class="progress-fill"></div></div>
+      <div id="progress">Question 1 of 20</div>
+      <h3 id="question">Question text</h3>
+      <div id="options"></div>
+      <button id="nextBtn">Next</button>
+      <div id="result"></div>
+    </div>
+
+    <!-- Hidden Formspree Form -->
+    <form
+      id="emailForm"
+      action="https://formspree.io/f/mpwyrvnr"
+      method="POST"
+      style="display: none">
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <input type="text" name="score" />
+      <input type="text" name="age" />
+      <input type="text" name="result" />
+      <button type="submit">Send</button>
+    </form>
+
+    <canvas id="certificateCanvas" style="display: none"></canvas>
+    <div style="position: absolute; bottom: 100px">
+      <a id="downloadLink" download="certificate.png">Download Certificate</a>
+    </div>
+
+    <script>
+      // Quiz questions
+      const questions = [
+        { question: "1 + 1 = ?", options: ["1", "2", "3", "4"], answer: "2" },
+        {
+          question: "Capital of Germany?",
+          options: ["Berlin", "Madrid", "Paris", "Rome"],
+          answer: "Berlin",
+        },
+        {
+          question: "HTML stands for?",
+          options: [
+            "Hyper Text Markup Language",
+            "Hot Mail",
+            "How To Make Lasagna",
+            "High Tech Modern Layout",
+          ],
+          answer: "Hyper Text Markup Language",
+        },
+        {
+          question: "Color of the sky?",
+          options: ["Blue", "Green", "Red", "Yellow"],
+          answer: "Blue",
+        },
+        {
+          question: "5 x 5 = ?",
+          options: ["10", "20", "25", "30"],
+          answer: "25",
+        },
+        {
+          question: "Which tag is used to link an external CSS file?",
+          options: ["<script>", "<style>", "<link>", "<css>"],
+          answer: "<link>",
+        },
+        {
+          question: "Which HTML tag is used to create a hyperlink?",
+          options: ["<a>", "<link>", "<href>", "<url>"],
+          answer: "<a>",
+        },
+        {
+          question: "Which property is used in CSS to change text color?",
+          options: ["font-color", "color", "text-color", "font-style"],
+          answer: "color",
+        },
+        {
+          question: "Inside which HTML element do we put JavaScript code?",
+          options: ["<javascript>", "<js>", "<script>", "<code>"],
+          answer: "<script>",
+        },
+        {
+          question: "Which symbol is used for comments in JavaScript?",
+          options: ["//", "/* */", "#", "<!-- -->"],
+          answer: "//",
+        },
+        {
+          question: "Which method is used to print something in the console?",
+          options: ["print()", "log()", "console.log()", "write()"],
+          answer: "console.log()",
+        },
+        {
+          question:
+            "Which keyword is used to declare a variable in JavaScript?",
+          options: ["var", "let", "const", "All of the above"],
+          answer: "All of the above",
+        },
+        {
+          question: "What does CSS stand for?",
+          options: [
+            "Colorful Style Sheets",
+            "Cascading Style Sheets",
+            "Computer Style Sheets",
+            "Creative Style System",
+          ],
+          answer: "Cascading Style Sheets",
+        },
+        {
+          question: "Which attribute is used in HTML to define inline styles?",
+          options: ["class", "style", "font", "styles"],
+          answer: "style",
+        },
+        {
+          question: "Which of the following is a JavaScript framework?",
+          options: ["React", "Laravel", "Django", "Flask"],
+          answer: "React",
+        },
+        {
+          question: "Which HTML tag is used to display an image?",
+          options: ["<picture>", "<img>", "<image>", "<photo>"],
+          answer: "<img>",
+        },
+        {
+          question: "What does DOM stand for?",
+          options: [
+            "Document Object Model",
+            "Data Object Method",
+            "Digital Ordinance Model",
+            "Document Oriented Module",
+          ],
+          answer: "Document Object Model",
+        },
+        {
+          question:
+            "Which operator is used to compare both value and type in JavaScript?",
+          options: ["==", "===", "!=", "="],
+          answer: "===",
+        },
+        {
+          question: "Which CSS property controls the text size?",
+          options: ["font-style", "text-size", "font-size", "text-style"],
+          answer: "font-size",
+        },
+        {
+          question: "Which HTML element is used to define the largest heading?",
+          options: ["<heading>", "<h6>", "<head>", "<h1>"],
+          answer: "<h1>",
+        },
+      ];
+
+      let current = 0,
+        score = 0,
+        timeLeft = 1800,
+        timerId,
+        student = {};
+
+      const questionEl = document.getElementById("question");
+      const optionsEl = document.getElementById("options");
+      const timerEl = document.getElementById("timer");
+      const progressEl = document.getElementById("progress");
+      const progressFill = document.querySelector(".progress-fill");
+      const nextBtn = document.getElementById("nextBtn");
+      const resultEl = document.getElementById("result");
+
+      function startQuiz() {
+        student.first = document.getElementById("first").value;
+        student.middle = document.getElementById("middle").value;
+        student.last = document.getElementById("last").value;
+        student.email = document.getElementById("email").value;
+        student.age = document.getElementById("age").value;
+
+        if (!student.first || !student.last || !student.email || !student.age) {
+          alert("Please fill all required fields.");
+          return;
+        }
+
+        document.getElementById("formContainer").style.display = "none";
+        document.getElementById("quizContainer").style.display = "block";
+
+        loadQuestion();
+        startTimer();
+      }
+
+      function startTimer() {
+        timerId = setInterval(() => {
+          timeLeft--;
+          let minutes = Math.floor(timeLeft / 60);
+          let seconds = timeLeft % 60;
+          timerEl.textContent = `Time Left: ${minutes}:${seconds
+            .toString()
+            .padStart(2, "0")}`;
+          if (timeLeft <= 0) {
+            clearInterval(timerId);
+            endQuiz();
+          }
+        }, 1000);
+      }
+
+      function loadQuestion() {
+        const q = questions[current];
+        questionEl.textContent = q.question;
+        optionsEl.innerHTML = "";
+        progressEl.textContent = `Question ${current + 1} of ${
+          questions.length
+        }`;
+        progressFill.style.width = `${
+          ((current + 1) / questions.length) * 100
+        }%`;
+
+        q.options.forEach((option) => {
+          const label = document.createElement("label");
+          label.classList.add("option");
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = "option";
+          input.value = option;
+          label.appendChild(input);
+          label.appendChild(document.createTextNode(" " + option));
+          optionsEl.appendChild(label);
+        });
+      }
+
+      nextBtn.addEventListener("click", () => {
+        const selected = document.querySelector('input[name="option"]:checked');
+        if (!selected) {
+          alert("Please select an answer.");
+          return;
+        }
+        if (selected.value === questions[current].answer) score++;
+        current++;
+        current < questions.length ? loadQuestion() : endQuiz();
+      });
+
+      // 🎯 Formspree email function
+      function sendResultFormspree(student, score, total) {
+        const passed = score >= 3 ? "Passed ✅" : "Failed ❌";
+        const form = document.getElementById("emailForm");
+        form.name.value = `${student.first} ${student.middle} ${student.last}`;
+        form.email.value = student.email;
+        form.score.value = `${score} / ${total}`;
+        form.age.value = student.age;
+        form.result.value = passed;
+        form.submit();
+        resultEl.innerHTML += `<p style="color:lightgreen;">📩 Result email sent successfully to ${student.email}</p>`;
+      }
+
+      function endQuiz() {
+        clearInterval(timerId);
+        const passed = score >= 3;
+        questionEl.style.display = "none";
+        optionsEl.style.display = "none";
+        nextBtn.style.display = "none";
+        timerEl.style.display = "none";
+        progressEl.style.display = "none";
+        progressFill.style.width = "100%";
+
+        resultEl.innerHTML = `
+        <div class="thank-you">🎉 Thank you for participating! 🎉</div>
+        <p><strong>Name:</strong> ${student.first} ${student.middle} ${
+          student.last
+        }</p>
+        <p><strong>Score:</strong> ${score} / ${questions.length}</p>
+        <p style="color:${passed ? "#3eff7e" : "red"}; font-weight:600;">
+          ${passed ? "✅ Passed" : "❌ Failed"}
+        </p>`;
+
+        generateCertificate(
+          student.first,
+          student.middle,
+          student.last,
+          score,
+          questions.length
+        );
+
+        // send email via Formspree
+        sendResultFormspree(student, score, questions.length);
+      }
+
+      function generateCertificate(first, middle, last, score, total) {
+        const canvas = document.getElementById("certificateCanvas");
+        const ctx = canvas.getContext("2d");
+        const passed = score >= 3;
+        canvas.width = 1000;
+        canvas.height = 700;
+
+        const gradient = ctx.createLinearGradient(0, 0, 1000, 700);
+        gradient.addColorStop(0, "#f0fff4");
+        gradient.addColorStop(1, "#ccf5d3");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 1000, 700);
+
+        ctx.font = "bold 50px Poppins";
+        ctx.fillStyle = "#145a32";
+        ctx.textAlign = "center";
+        ctx.fillText("Certificate of Achievement", 500, 120);
+
+        ctx.font = "28px Poppins";
+        ctx.fillStyle = "#000";
+        ctx.fillText(`This certifies that`, 500, 200);
+        ctx.font = "bold 40px Poppins";
+        ctx.fillText(`${first} ${middle} ${last}`, 500, 270);
+
+        ctx.font = "26px Poppins";
+        ctx.fillText(`has successfully completed the Student Quiz`, 500, 340);
+        ctx.fillText(`with a score of ${score}/${total}`, 500, 390);
+
+        ctx.fillStyle = passed ? "green" : "red";
+        ctx.fillText(passed ? "✅ Passed" : "❌ Failed", 500, 440);
+
+        const date = new Date().toLocaleDateString();
+        ctx.fillStyle = "#000";
+        ctx.font = "20px Poppins";
+        ctx.fillText(`Date: ${date}`, 500, 500);
+
+        const downloadLink = document.getElementById("downloadLink");
+        downloadLink.href = canvas.toDataURL("image/png");
+        downloadLink.style.display = "block";
+      }
+    </script>
+  </body>
+</html>
